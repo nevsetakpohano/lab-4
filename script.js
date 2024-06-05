@@ -4,7 +4,8 @@ const contextNeNapr = canvasNeNapr.getContext("2d");
 const contextNapr = canvasNapr.getContext("2d");
 
 const qntnNodes = 10;
-const coef = 1.0 - 0 * 0.01 - 1 * 0.01 - 0.3;
+const coef1 = 1.0 - 0 * 0.01 - 1 * 0.01 - 0.3;
+const coef2 = 1.0 - 0 * 0.005 - 1 * 0.005 - 0.27;
 const radius = 15;
 
 const nodePositions = [
@@ -20,14 +21,14 @@ const nodePositions = [
   { x: 120, y: 350 }, //10
 ];
 
-function generateAdjacencyMatrixSymmetrical() {
+function generateAdjacencyMatrixSymmetrical(coef) {
   const seed = 3301;
   let matrix = [];
   Math.seedrandom(seed);
   for (let i = 0; i < qntnNodes; i++) {
     matrix[i] = [];
     for (let j = 0; j < qntnNodes; j++) {
-      matrix[i][j] = Math.random() * 2 * coef;
+      matrix[i][j] = Math.random() * 2 * coef1;
       matrix[i][j] = matrix[i][j] < 1 ? 0 : 1;
     }
   }
@@ -41,7 +42,7 @@ function generateAdjacencyMatrixSymmetrical() {
   return matrix;
 }
 
-function generateAdjacencyMatrixNotSymmetrical() {
+function generateAdjacencyMatrixNotSymmetrical(coef) {
   const seed = 3301;
   let matrix = [];
   Math.seedrandom(seed);
@@ -197,11 +198,11 @@ function drawAllEdges(matrix, context) {
   }
 }
 
-const matrixSymmetrical = generateAdjacencyMatrixSymmetrical();
-console.log(matrixSymmetrical);
+const matrixSymmetrical = generateAdjacencyMatrixSymmetrical(coef1);
+console.log("Symmetrical matrix : ", matrixSymmetrical);
 
-const matrixNotSymmetrical = generateAdjacencyMatrixNotSymmetrical();
-console.log(matrixNotSymmetrical);
+const matrixNotSymmetrical = generateAdjacencyMatrixNotSymmetrical(coef1);
+console.log("Not symmetrical matrix : ", matrixNotSymmetrical);
 
 drawAllEdges(matrixNotSymmetrical, contextNapr);
 drawAllEdges(matrixSymmetrical, contextNeNapr);
