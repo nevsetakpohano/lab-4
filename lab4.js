@@ -237,7 +237,7 @@ console.log("Degrees of symmetrical matrix : ");
 console.log(degreesSymmetrical);
 isGraphRegular(degreesSymmetrical);
 printHangingAndIsolatedNodes(degreesSymmetrical);
-//countPaths(matrixSymmetrical);
+countPaths(matrixSymmetrical);
 let reachabilitySymmetrical = reachabilityMatrix(matrixNotSymmetrical);
 console.log(reachabilitySymmetrical);
 
@@ -246,7 +246,7 @@ console.log("Degrees of not symmetrical matrix : ");
 console.log(degreesNotSymmetrical);
 isGraphRegular(degreesNotSymmetrical);
 printHangingAndIsolatedNodes(degreesNotSymmetrical);
-//countPaths(matrixNotSymmetrical);
+countPaths(matrixNotSymmetrical);
 let reachabilityNotSymmetrical = reachabilityMatrix(matrixNotSymmetrical);
 console.log(reachabilityNotSymmetrical);
 
@@ -273,5 +273,4 @@ const nodePositionsCond = [
 ];
 
 drawAllEdges(strongConnectivityMatrix, contextCond, nodePositionsCond);
-
 drawAllNodes(contextCond, "#DAB785", "black", nodePositionsCond);
