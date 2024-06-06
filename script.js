@@ -3,7 +3,10 @@ const canvasNapr = document.getElementById("napr");
 const contextNeNapr = canvasNeNapr.getContext("2d");
 const contextNapr = canvasNapr.getContext("2d");
 
-const qntnNodes = 10;
+const canvasCond = document.getElementById("condGraph");
+const contextCond = canvasCond.getContext("2d");
+
+let qntnNodes = 10;
 const coef1 = 1.0 - 0 * 0.01 - 1 * 0.01 - 0.3;
 const coef2 = 1.0 - 0 * 0.005 - 1 * 0.005 - 0.27;
 const radius = 15;
@@ -56,20 +59,22 @@ function generateAdjacencyMatrixNotSymmetrical(coef) {
   return matrix;
 }
 
-function drawAllNodes(context, colour, txtColour) {
-  nodePositions.forEach((position, index) => {
-    context.fillStyle = colour;
-    context.strokeStyle = "black";
-    context.lineWidth = 2;
-    context.beginPath();
-    context.arc(position.x, position.y, radius, 0, Math.PI * 2, true);
-    context.fill();
-    context.stroke();
-    context.font = "14px Times New Roman";
-    context.fillStyle = txtColour;
-    context.textAlign = "center";
-    context.textBaseline = "middle";
-    context.fillText(`${index + 1}`, position.x, position.y);
+function drawAllNodes(context, colour, txtColour, neededNodePositions) {
+  neededNodePositions.forEach((position, index) => {
+    if (index < qntnNodes) {
+      context.fillStyle = colour;
+      context.strokeStyle = "black";
+      context.lineWidth = 2;
+      context.beginPath();
+      context.arc(position.x, position.y, radius, 0, Math.PI * 2, true);
+      context.fill();
+      context.stroke();
+      context.font = "14px Times New Roman";
+      context.fillStyle = txtColour;
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.fillText(`${index + 1}`, position.x, position.y);
+    }
   });
 }
 
@@ -114,22 +119,29 @@ const drawArrow = (x, y, context, angle, size) => {
   context.restore();
 };
 
-function drawEdgeArrow(fromNode, toNode, context) {
-  const startX = nodePositions[fromNode].x;
-  const startY = nodePositions[fromNode].y;
-  const endX = nodePositions[toNode].x;
-  const endY = nodePositions[toNode].y;
+function drawEdgeArrow(fromNode, toNode, context, neededNodePositions) {
+  const startX = neededNodePositions[fromNode].x;
+  const startY = neededNodePositions[fromNode].y;
+  const endX = neededNodePositions[toNode].x;
+  const endY = neededNodePositions[toNode].y;
   const angle = Math.atan2(startY - endY, startX - endX);
   const indentX = radius * Math.cos(angle);
   const indentY = radius * Math.sin(angle);
   drawArrow(endX + indentX, endY + indentY, context, angle, 4);
 }
 
-function drawEdge(fromNode, toNode, context, colour, lineWidth) {
-  const startX = nodePositions[fromNode].x;
-  const startY = nodePositions[fromNode].y;
-  const endX = nodePositions[toNode].x;
-  const endY = nodePositions[toNode].y;
+function drawEdge(
+  fromNode,
+  toNode,
+  context,
+  colour,
+  lineWidth,
+  neededNodePositions
+) {
+  const startX = neededNodePositions[fromNode].x;
+  const startY = neededNodePositions[fromNode].y;
+  const endX = neededNodePositions[toNode].x;
+  const endY = neededNodePositions[toNode].y;
   context.strokeStyle = colour;
   context.lineWidth = lineWidth;
   context.beginPath();
@@ -139,19 +151,27 @@ function drawEdge(fromNode, toNode, context, colour, lineWidth) {
   context.closePath();
 }
 
-function drawAllEdges(matrix, context) {
+function drawAllEdges(matrix, context, neededNodePositions) {
   for (let i = 0; i < qntnNodes; i++) {
     for (let j = 0; j < qntnNodes; j++) {
       if (matrix[i][j] === 1) {
-        drawEdge(i, j, context, "black", 2);
+        if (neededNodePositions === nodePositions) {
+          drawEdge(i, j, context, "black", 2, nodePositions);
+        } else if (neededNodePositions === nodePositionsCond) {
+          drawEdge(i, j, context, "black", 2, nodePositionsCond);
+        }
 
-        if (context === contextNapr) {
-          drawEdgeArrow(i, j, context);
+        if (context === contextNapr || context === contextCond) {
+          if (neededNodePositions === nodePositions) {
+            drawEdgeArrow(i, j, context, nodePositions);
+          } else if (neededNodePositions === nodePositionsCond) {
+            drawEdgeArrow(i, j, context, nodePositionsCond);
+          }
         }
         if (i === j) {
           context.beginPath();
-          const endX = nodePositions[j].x;
-          const endY = nodePositions[j].y;
+          const endX = neededNodePositions[j].x;
+          const endY = neededNodePositions[j].y;
           if (i < 5) {
             context.arc(
               endX,
@@ -161,10 +181,10 @@ function drawAllEdges(matrix, context) {
               (3 * Math.PI) / 2,
               true
             );
-            if (context === contextNapr) {
+            if (context === contextNapr || context === contextCond) {
               drawArrow(
-                nodePositions[i].x + 5,
-                nodePositions[i].y - 15,
+                neededNodePositions[i].x + 5,
+                neededNodePositions[i].y - 15,
                 context,
                 -Math.PI / 4,
                 4
@@ -180,10 +200,10 @@ function drawAllEdges(matrix, context) {
               (-3 * Math.PI) / 2,
               true
             );
-            if (context === contextNapr) {
+            if (context === contextNapr || context === contextCond) {
               drawArrow(
-                nodePositions[i].x + 5,
-                nodePositions[i].y + 15,
+                neededNodePositions[i].x + 5,
+                neededNodePositions[i].y + 15,
                 context,
                 Math.PI / 4,
                 4
@@ -204,8 +224,8 @@ console.log("Symmetrical matrix : ", matrixSymmetrical);
 const matrixNotSymmetrical = generateAdjacencyMatrixNotSymmetrical(coef1);
 console.log("Not symmetrical matrix : ", matrixNotSymmetrical);
 
-drawAllEdges(matrixNotSymmetrical, contextNapr);
-drawAllEdges(matrixSymmetrical, contextNeNapr);
+drawAllEdges(matrixNotSymmetrical, contextNapr, nodePositions);
+drawAllEdges(matrixSymmetrical, contextNeNapr, nodePositions);
 
-drawAllNodes(contextNeNapr, "#DAB785", "black");
-drawAllNodes(contextNapr, "#DAB785", "black");
+drawAllNodes(contextNeNapr, "#DAB785", "black", nodePositions);
+drawAllNodes(contextNapr, "#DAB785", "black", nodePositions);
